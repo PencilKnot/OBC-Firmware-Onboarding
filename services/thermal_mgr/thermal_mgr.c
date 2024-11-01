@@ -60,7 +60,7 @@ error_code_t thermalMgrSendEvent(thermal_mgr_event_t *event) {
 void osHandlerLM75BD(void) {
   /* Implement this function */
   float temperature;
-  readTempLM75BD(0x4F, &temperature);
+  readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temperature);
   if(temperature > 75.0){ // only below T hys is safe
     overTemperatureDetected();
   }
@@ -75,12 +75,11 @@ void osHandlerLM75BD(void) {
 static void thermalMgr(void *pvParameters) {
   /* Implement this task */
   while (1) {
-    if(xQueueReceive(thermalMgrQueueHandle, pvParameters, 0)){
-      if(sizeof(pvParameters) == sizeof(thermal_mgr_event_t)){ // if event has right type
-        float temperature;
-        readTempLM75BD(0x4F, &temperature);
-        addTemperatureTelemetry(temperature);
-      }
+    thermal_mgr_event_t data = *(thermal_mgr_event_t *) pvParameters;
+    if(xQueueReceive(thermalMgrQueueHandle, pvParameters, 0) == pdTRUE && data.type == THERMAL_MGR_EVENT_MEASURE_TEMP_CMD){
+      float temperature;
+      readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temperature);
+      addTemperatureTelemetry(temperature);
     }
   }
 }
