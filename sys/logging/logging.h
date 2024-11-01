@@ -70,6 +70,7 @@ void logSetLevel(log_level_t newLogLevel);
  * @return error_code_t
  *
  */
+
 error_code_t logLog(log_level_t msgLevel, const char *file, uint32_t line, const char *s, ...);
 
 #ifdef __cplusplus

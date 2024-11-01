@@ -27,7 +27,33 @@ error_code_t lm75bdInit(lm75bd_config_t *config) {
 
 error_code_t readTempLM75BD(uint8_t devAddr, float *temp) {
   /* Implement this driver function */
-  
+  /* 
+  Pointer register for internal temperature: 0x00000000
+  devAddr + temperature register
+
+  1. Select internal temp register using pointer register
+  2. Use I2C write to set
+  3. Use I2C read to get temp data
+  4. Perform conversions
+  */
+
+  // Stores temperature register value
+  uint8_t buffer[2];
+  uint16_t temperature = 0;
+
+  // Use pointer register to select internal temperature register
+  i2cSendTo(devAddr, 0x0U, 1U);
+
+  // Get data on temperature sensor
+  i2cReceiveFrom(devAddr, buffer, 2U);
+
+  // Convert buffer to one binary integer
+  temperature = ((buffer[0] << 8) | buffer[1]) >> 5;
+
+  if((temperature >> 10) == 0) *temp = (float)(temperature * 0.125);
+  // 0xFFFF deletes extra ones from flipped temperature data
+  else *temp = -(((~temperature) & (0xFFFF >> 5)) + 1)*0.125;
+
   return ERR_CODE_SUCCESS;
 }
 
