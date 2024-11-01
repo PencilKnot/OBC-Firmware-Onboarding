@@ -25,24 +25,22 @@ error_code_t lm75bdInit(lm75bd_config_t *config) {
   return ERR_CODE_SUCCESS;
 }
 
+/**
+ * @brief Converts data from LM75B temperature sensor to Celcius
+ * 
+ * @param devAddr - I2C device address of sensor
+ * @param temp - Pointer to store converted temperature value in Celsius
+ * @return ERR_CODE_SUCCESS if reading and conversion succeed
+ */
 error_code_t readTempLM75BD(uint8_t devAddr, float *temp) {
-  /* Implement this driver function */
-  /* 
-  Pointer register for internal temperature: 0x00000000
-  devAddr + temperature register
-
-  1. Select internal temp register using pointer register
-  2. Use I2C write to set
-  3. Use I2C read to get temp data
-  4. Perform conversions
-  */
 
   // Stores temperature register value
+  uint8_t sendBuffer = 0x0U;
   uint8_t buffer[2];
   uint16_t temperature = 0;
 
   // Use pointer register to select internal temperature register
-  i2cSendTo(devAddr, 0x0U, 1U);
+  i2cSendTo(devAddr, &sendBuffer, 1U);
 
   // Get data on temperature sensor
   i2cReceiveFrom(devAddr, buffer, 2U);

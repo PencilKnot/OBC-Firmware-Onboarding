@@ -41,12 +41,22 @@ void initThermalSystemManager(lm75bd_config_t *config) {
 
 }
 
+/**
+ * @brief Sends event to thermal manager queue
+ * 
+ * @param event - Pointer to thermal manager event to send
+ * @return ERR_CODE_SUCCESS if the event is successfully sent
+ */
 error_code_t thermalMgrSendEvent(thermal_mgr_event_t *event) {
   /* Send an event to the thermal manager queue */
   xQueueSend(thermalMgrQueueHandle, event, 0);
   return ERR_CODE_SUCCESS;
 }
 
+/**
+ * @brief OS interrupt handler for LM75B temperature sensor
+ * 
+ */
 void osHandlerLM75BD(void) {
   /* Implement this function */
   float temperature;
@@ -57,6 +67,11 @@ void osHandlerLM75BD(void) {
   else safeOperatingConditions();
 }
 
+/**
+ * @brief Thermal management task for temperature events
+ * 
+ * @param pvParameters - Pointer to parameters passed to task
+ */
 static void thermalMgr(void *pvParameters) {
   /* Implement this task */
   while (1) {
