@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /* LM75BD I2C Device Address */
-#define LM75BD_OBC_I2C_ADDR 0x4FU /* Define the address here */
+#define LM75BD_OBC_I2C_ADDR 0x4F /* Define the address here */
 // A0, A1, A2 all connected to VCC 
 
 /* LM75BD Configuration Values */

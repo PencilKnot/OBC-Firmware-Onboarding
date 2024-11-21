@@ -33,24 +33,23 @@ error_code_t lm75bdInit(lm75bd_config_t *config) {
  * @return ERR_CODE_SUCCESS if reading and conversion succeed
  */
 error_code_t readTempLM75BD(uint8_t devAddr, float *temp) {
+  // Check for null temp
+  if(temp == NULL) return ERR_CODE_INVALID_ARG;
+
+  // Use pointer register to select internal temperature register
+  RETURN_IF_ERROR_CODE(i2cSendTo(devAddr, &sendBuffer, sizeof(sendBuffer)));
+
+  // Get data on temperature sensor
+  RETURN_IF_ERROR_CODE(i2cReceiveFrom(devAddr, buffer, sizeof(buffer)));
 
   // Stores temperature register value
   uint8_t sendBuffer = 0x0U;
-  uint8_t buffer[2];
-  uint16_t temperature = 0;
-
-  // Use pointer register to select internal temperature register
-  i2cSendTo(devAddr, &sendBuffer, 1U);
-
-  // Get data on temperature sensor
-  i2cReceiveFrom(devAddr, buffer, 2U);
+  uint8_t buffer[2] = {0,0};
+  int16_t temperature = 0;
 
   // Convert buffer to one binary integer
   temperature = ((buffer[0] << 8) | buffer[1]) >> 5;
-
-  if((temperature >> 10) == 0) *temp = (float)(temperature * 0.125);
-  // 0xFFFF deletes extra ones from flipped temperature data
-  else *temp = -(((~temperature) & (0xFFFF >> 5)) + 1)*0.125;
+  *temp = (float)(temperature * 0.125);
 
   return ERR_CODE_SUCCESS;
 }
